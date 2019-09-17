@@ -22,14 +22,14 @@
 * ZFS Tuning, set prefetch method and max write speed to l2arc
 * Enable TCP BBR congestion control, improves overall network throughput
 
-https://raw.githubusercontent.com/extremeshok/xshok-proxmox/master/install-post.sh
+https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh
 
 return value is 0
 
 Or run *install-post.sh* after installation
 
 ```
-wget https://raw.githubusercontent.com/extremeshok/xshok-proxmox/master/install-post.sh -c -O install-post.sh && bash install-post.sh && rm install-post.sh
+wget https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh -c -O install-post.sh && bash install-post.sh && rm install-post.sh
 ```
 
 ## Install Proxmox Recommendations
@@ -151,7 +151,7 @@ curl -O https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/debi
 ## Enable Docker support for an LXC container (pve-enable-lxc-docker.sh) *optional*
 There can be security implications as the LXC container is running in a higher privileged mode.
 ```
-curl https://raw.githubusercontent.com/extremeshok/xshok-proxmox/master/pve-enable-lxc-docker.sh --output /usr/sbin/pve-enable-lxc-docker && chmod +x /usr/sbin/pve-enable-lxc-docker
+curl https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/pve-enable-lxc-docker.sh --output /usr/sbin/pve-enable-lxc-docker && chmod +x /usr/sbin/pve-enable-lxc-docker
 pve-enable-lxc-docker container_id
 ```
 
