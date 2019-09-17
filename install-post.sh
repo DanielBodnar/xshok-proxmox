@@ -56,7 +56,7 @@ sed -i "s/main contrib/main non-free contrib/g" /etc/apt/sources.list
 apt-get update > /dev/null
 
 ## Install common utils
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git 
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git zfs
 
 ## Remove conflicting utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' purge ntp openntpd chrony ksm-control-daemon
@@ -82,8 +82,10 @@ pveam update
 systemctl enable ksmtuned
 systemctl enable ksm
 
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
 ## Install ceph support
-echo "Y" | pveceph install
+#echo "Y" | pveceph install
 
 ## Install common system utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset
@@ -317,6 +319,7 @@ fi
 
 # propagate the setting into the kernel
 update-initramfs -u -k all
+update-grub
 
 ## Script Finish
 echo -e '\033[1;33m Finished....please restart the system \033[0m'
