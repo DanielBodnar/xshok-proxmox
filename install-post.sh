@@ -55,8 +55,20 @@ sed -i "s/main contrib/main non-free contrib/g" /etc/apt/sources.list
 ## Refresh the package lists
 apt-get update > /dev/null
 
+
+## Install common system utilities
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git zfs nfs-kernel-server
+
+# add docker key
+curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
+
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+   $(lsb_release -cs) \
+   stable"
+
 ## Install common utils
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git zfs
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git zfs 
 
 ## Remove conflicting utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' purge ntp openntpd chrony ksm-control-daemon
@@ -82,13 +94,20 @@ pveam update
 systemctl enable ksmtuned
 systemctl enable ksm
 
+
+
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 ## Install ceph support
 #echo "Y" | pveceph install
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset \
+  apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git zfs nfs-kernel-server docker-ce 
+
+# add docker key
+curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
+
 #snmpd snmp-mibs-downloader
 
 ## Detect AMD EPYC CPU and install kernel 4.15
@@ -316,6 +335,16 @@ options zfs l2arc_noprefetch=0
 options zfs l2arc_write_max=524288000
 EOF
 fi
+
+# install docker
+
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
+  apt-transport-https ca-certificates curl gnupg2 software-properties-common \
+  
+
+
+
+
 
 # propagate the setting into the kernel
 update-initramfs -u -k all
