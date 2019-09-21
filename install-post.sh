@@ -30,21 +30,6 @@ export LANG="en_US.UTF-8"
 export LC_ALL="C"
 
 
-function insert_if_missing {
-	case `grep -Fx "$1" "$2" >/dev/null; echo $?` in
-	  1)
-	    # code if not found
-	    ;;
-	  *)
-	    # code if an error occurred
-	    ;;
-	esac
-}
-
-
-
-
-
 
 ## Force APT to use IPv4
 echo -e "Acquire::ForceIPv4 \"true\";\\n" > /etc/apt/apt.conf.d/99force-ipv4
@@ -77,13 +62,6 @@ apt-get update > /dev/null
 ## Install common system utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git zfs nfs-kernel-server
 
-# add docker key
-curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
-
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-   $(lsb_release -cs) \
-   stable"
 
 ## Install common utils
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git zfs 
@@ -147,8 +125,14 @@ systemctl enable ksm
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset \
   apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git zfs nfs-kernel-server docker-ce 
 
+
 # add docker key
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
+
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+   $(lsb_release -cs) \
+   stable"
 
 #snmpd snmp-mibs-downloader
 
@@ -256,7 +240,7 @@ sed -i "s/#pigz:.*/pigz: 1/" /etc/vzdump.conf
 sed -i "s/#ionice:.*/ionice: 5/" /etc/vzdump.conf
 
 ## Bugfix: pve 5.1 high swap usage with low memory usage
-echo "vm.swappiness=10" >> /etc/sysctl.conf
+echo "vm.swappiness=5" >> /etc/sysctl.conf
 sysctl -p
 
 ## Bugfix: reserve 512MB memory for system
