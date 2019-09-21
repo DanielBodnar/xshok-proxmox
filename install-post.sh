@@ -116,17 +116,20 @@ systemctl enable ksmtuned
 systemctl enable ksm
 
 
-## Install ceph support
-#echo "Y" | pveceph install
+## Refresh the package lists
+apt-get update > /dev/null
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common
 
 # add docker key
-curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' add-apt-repository \
+/usr/bin/env DEBIAN_FRONTEND=noninteractive add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
    $(lsb_release -cs) \
    stable"
    
+apt-get update > /dev/null
+
 ## Install common system utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
 
@@ -373,7 +376,7 @@ update-grub
 mv ~/.oh-my-zsh{,.bak}
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
 
 ## Remove no longer required packages and purge old cached updates
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoremove
