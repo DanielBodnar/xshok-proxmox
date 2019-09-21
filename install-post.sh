@@ -24,9 +24,27 @@
 #
 ################################################################################
 
+
 # Set the local
 export LANG="en_US.UTF-8"
 export LC_ALL="C"
+
+
+function insert_if_missing {
+	case `grep -Fx "$1" "$2" >/dev/null; echo $?` in
+	  1)
+	    # code if not found
+	    ;;
+	  *)
+	    # code if an error occurred
+	    ;;
+	esac
+}
+
+
+
+
+
 
 ## Force APT to use IPv4
 echo -e "Acquire::ForceIPv4 \"true\";\\n" > /etc/apt/apt.conf.d/99force-ipv4
@@ -121,7 +139,6 @@ systemctl enable ksm
 
 
 
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 ## Install ceph support
 #echo "Y" | pveceph install
@@ -159,6 +176,7 @@ fi
 echo "kexec-tools kexec-tools/load_kexec boolean false" | debconf-set-selections
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install kexec-tools
 
+if [ -f "/etc/systemd/system/kexec-pve.service" ]; then
 cat <<'EOF' > /etc/systemd/system/kexec-pve.service
 [Unit]
 Description=boot into into the latest pve kernel set as primary in the boot-loader
@@ -175,10 +193,7 @@ WantedBy=kexec.target
 EOF
 systemctl enable kexec-pve.service
 echo "alias reboot-quick='systemctl kexec'" >> /root/.bash_profile
-
-## Remove no longer required packages and purge old cached updates
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoremove
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoclean
+fi 
 
 ## Disable portmapper / rpcbind (security)
 #systemctl disable rpcbind
@@ -264,14 +279,14 @@ fi
 if [ -z "${NO_MOTD_BANNER}" ] ; then
   if ! grep -q https "/etc/motd" ; then
     cat << 'EOF' > /etc/motd.new
-	   This system is optimised by:            https://eXtremeSHOK.com
-	     __   ___                            _____ _    _  ____  _  __
-	     \ \ / / |                          / ____| |  | |/ __ \| |/ /
-	  ___ \ V /| |_ _ __ ___ _ __ ___   ___| (___ | |__| | |  | | ' /
-	 / _ \ > < | __| '__/ _ \ '_ ` _ \ / _ \\___ \|  __  | |  | |  <
-	|  __// . \| |_| | |  __/ | | | | |  __/____) | |  | | |__| | . \
-	 \___/_/ \_\\__|_|  \___|_| |_| |_|\___|_____/|_|  |_|\____/|_|\_\
-
+	   This system is optimised by:            Daniel Bodnar
+#  ###                                                                               
+#   #     #    #  ####  ######      ##   #####   ####  #    #    #####  ##### #    # 
+#   #     #    # #      #          #  #  #    # #    # #    #    #    #   #   #    # 
+#   #     #    #  ####  #####     #    # #    # #      ######    #####    #   #    # 
+#   #     #    #      # #         ###### #####  #      #    #    #    #   #   # ## # 
+#   #     #    # #    # #         #    # #   #  #    # #    #    #    #   #   ##  ## 
+#  ###     ####   ####  ######    #    # #    #  ####  #    #    #####    #   #    # 
 
 EOF
 
@@ -282,6 +297,8 @@ fi
 
 ## Increase max user watches
 # BUG FIX : No space left on device
+
+
 echo 1048576 > /proc/sys/fs/inotify/max_user_watches
 echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf
 sysctl -p /etc/sysctl.conf
@@ -361,21 +378,22 @@ options zfs l2arc_write_max=524288000
 EOF
 fi
 
-# install docker
-
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
-  apt-transport-https ca-certificates curl gnupg2 software-properties-common
-  
-
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
   samba
-
-
 
 
 # propagate the setting into the kernel
 update-initramfs -u -k all
 update-grub
+
+mv ~/.oh-my-zsh{,.bak}
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+
+## Remove no longer required packages and purge old cached updates
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoremove
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoclean
+
 
 ## Script Finish
 echo -e '\033[1;33m Finished....please restart the system \033[0m'
