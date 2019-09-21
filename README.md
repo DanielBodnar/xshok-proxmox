@@ -29,7 +29,7 @@ return value is 0
 Or run *install-post.sh* after installation
 
 ```
-wget https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh -O - | sh -
+wget https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh && chmod +x install-post.sh && ./install-post.sh && rm -f install-post.sh
 ```
 
 Forward eth traffic to infiniband nic and vice versa.
