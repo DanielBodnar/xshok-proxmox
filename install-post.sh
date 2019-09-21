@@ -110,7 +110,7 @@ curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gp
 
 #snmpd snmp-mibs-downloader
 
-## Detect AMD EPYC CPU and install kernel 4.15
+## Detect AMD EPYC CPU and install kernel 5.0
 if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ]; then
   echo "AMD EPYC detected"
   #Apply EPYC fix to kernel : Fixes random crashing and instability
@@ -160,11 +160,11 @@ echo "alias reboot-quick='systemctl kexec'" >> /root/.bash_profile
 #systemctl stop rpcbind
 
 ## Set Timezone to UTC and enable NTP
-timedatectl set-timezone UTC
+timedatectl set-timezone America/Chicago
 cat <<EOF > /etc/systemd/timesyncd.conf
 [Time]
-NTP=0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
-FallbackNTP=0.debian.pool.ntp.org 1.debian.pool.ntp.org 2.debian.pool.ntp.org 3.debian.pool.ntp.org
+NTP=time.cloudflare.com
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
 RootDistanceMaxSec=5
 PollIntervalMinSec=32
 PollIntervalMaxSec=2048
@@ -339,9 +339,11 @@ fi
 # install docker
 
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
-  apt-transport-https ca-certificates curl gnupg2 software-properties-common \
+  apt-transport-https ca-certificates curl gnupg2 software-properties-common
   
 
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
+  samba
 
 
 
