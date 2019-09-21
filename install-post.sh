@@ -111,6 +111,8 @@ fi
 systemctl enable ksmtuned
 systemctl enable ksm
 
+echo 1 >/sys/kernel/mm/ksm/run
+echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
 
 ## Refresh the package lists
 apt update > /dev/null
@@ -364,7 +366,6 @@ fi
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' apt install -y \
   samba
 
-
 # propagate the setting into the kernel
 update-initramfs -u -k all
 update-grub
@@ -373,6 +374,9 @@ mv ~/.oh-my-zsh{,.bak}
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
+
+systemctl enable --now netdata
+
 
 ## Remove no longer required packages and purge old cached updates
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoremove
