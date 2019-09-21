@@ -60,11 +60,11 @@ apt-get update > /dev/null
 
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git zfs nfs-kernel-server
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git nfs-kernel-server vim git tmux
 
 
 ## Install common utils
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git zfs 
+#/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git 
 
 ## Remove conflicting utilities
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' purge ntp openntpd chrony ksm-control-daemon
