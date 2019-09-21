@@ -29,7 +29,14 @@ return value is 0
 Or run *install-post.sh* after installation
 
 ```
-wget https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh -c -O install-post.sh && bash install-post.sh && rm install-post.sh
+wget https://raw.githubusercontent.com/DanielBodnar/xshok-proxmox/master/install-post.sh -O - | sh -
+```
+
+Forward eth traffic to infiniband nic and vice versa.
+```shell
+echo 1 > /proc/sys/net/ipv4/ip_forward
+iptables -A FORWARD -i eth0 -o ib0 -j ACCEPT
+iptables -A FORWARD -i ib0 -o eth0 -j ACCEPT
 ```
 
 ## Install Proxmox Recommendations
