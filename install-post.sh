@@ -56,37 +56,33 @@ sed -i "s/main contrib/main non-free contrib/g" /etc/apt/sources.list
 # echo "deb http://download.proxmox.com/debian/ceph-luminous buster main" > /etc/apt/sources.list.d/ceph.list
 
 ## Refresh the package lists
-apt-get update > /dev/null
+apt update > /dev/null
 
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install tuned apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git nfs-kernel-server vim git tmux
-
-
-## Install common utils
-#/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install vim git 
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install tuned apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git nfs-kernel-server vim git tmux
 
 ## Remove conflicting utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' purge ntp openntpd chrony ksm-control-daemon
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' purge ntp openntpd chrony ksm-control-daemon
 
 ## Fix no public key error for debian repo
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install debian-archive-keyring
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install debian-archive-keyring
 
 ## Update proxmox and install various system utils
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' dist-upgrade
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' dist-upgrade
 pveam update
 
 ## Fix no public key error for debian repo
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install debian-archive-keyring
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install debian-archive-keyring
 
 ## Install openvswitch for a virtual internal network
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install openvswitch-switch
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install openvswitch-switch
 
 ## Install zfs support, appears to be missing on some Proxmox installs.
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install zfsutils
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install zfsutils
 
 ## Install zfs-auto-snapshot
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install zfs-auto-snapshot
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install zfs-auto-snapshot
 # make 5min snapshots , keep 12 5min snapshots
 if [ -f "/etc/cron.d/zfs-auto-snapshot" ] ; then
   sed -i 's|--keep=[0-9]*|--keep=12|g' /etc/cron.d/zfs-auto-snapshot
@@ -111,14 +107,14 @@ fi
 
 
 ## Install missing ksmtuned
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install ksmtuned
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install ksmtuned
 systemctl enable ksmtuned
 systemctl enable ksm
 
 
 ## Refresh the package lists
-apt-get update > /dev/null
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+apt update > /dev/null
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common
 
 # add docker key
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
@@ -128,10 +124,10 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
    $(lsb_release -cs) \
    stable"
    
-apt-get update > /dev/null
+apt update > /dev/null
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
 
 
 
@@ -147,7 +143,7 @@ if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ]; then
     update-grub
   fi
   echo "Installing kernel pve-kernel-5.0.21-1-pve"
-  /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install pve-kernel-5.0.21-1-pve
+  /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install pve-kernel-5.0.21-1-pve
 fi
 
 if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ] || [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "Ryzen")" != "" ]; then
@@ -159,7 +155,7 @@ fi
 ## Install kexec, allows for quick reboots into the latest updated kernel set as primary in the boot-loader.
 # use command 'reboot-quick'
 echo "kexec-tools kexec-tools/load_kexec boolean false" | debconf-set-selections
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install kexec-tools
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install kexec-tools
 
 if [ -f "/etc/systemd/system/kexec-pve.service" ]; then
 cat <<'EOF' > /etc/systemd/system/kexec-pve.service
@@ -210,7 +206,7 @@ chmod +x /bin/pigzwrapper
 chmod +x /bin/gzip
 
 # ## Protect the web interface with fail2ban
-# /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install fail2ban
+# /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install fail2ban
 # # shellcheck disable=1117
 # cat <<EOF > /etc/fail2ban/filter.d/proxmox.conf
 # [Definition]
@@ -365,7 +361,7 @@ options zfs l2arc_write_max=524288000
 EOF
 fi
 
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' apt-get install -y \
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' apt install -y \
   samba
 
 
@@ -379,8 +375,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
 
 ## Remove no longer required packages and purge old cached updates
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoremove
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoclean
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoremove
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoclean
 
 
 ## Script Finish
