@@ -60,7 +60,7 @@ apt-get update > /dev/null
 
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git nfs-kernel-server vim git tmux
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install tuned apt-transport-https ca-certificates curl gnupg2 software-properties-common vim git nfs-kernel-server vim git tmux
 
 
 ## Install common utils
@@ -116,8 +116,6 @@ systemctl enable ksmtuned
 systemctl enable ksm
 
 
-
-
 ## Install ceph support
 #echo "Y" | pveceph install
 
@@ -130,7 +128,7 @@ curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gp
    stable"
    
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset docker-ce
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip software-properties-common aptitude curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
 
 
 
@@ -239,13 +237,15 @@ sed -i "s/#bwlimit:.*/bwlimit: 0/" /etc/vzdump.conf
 sed -i "s/#pigz:.*/pigz: 1/" /etc/vzdump.conf
 sed -i "s/#ionice:.*/ionice: 5/" /etc/vzdump.conf
 
-## Bugfix: pve 5.1 high swap usage with low memory usage
-echo "vm.swappiness=5" >> /etc/sysctl.conf
-sysctl -p
+if ! grep -q "vm.swappiness" "/etc/sysctl.conf" ; then
+	echo "vm.swappiness=5" >> /etc/sysctl.conf
+	sysctl -p
+	
+	## Bugfix: reserve 512MB memory for system
+	echo "vm.min_free_kbytes = 524288" >> /etc/sysctl.conf
+	sysctl -p
+fi
 
-## Bugfix: reserve 512MB memory for system
-echo "vm.min_free_kbytes = 524288" >> /etc/sysctl.conf
-sysctl -p
 
 ## Remove subscription banner
 if [ -f "/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js" ] ; then
@@ -261,7 +261,7 @@ fi
 
 ## Pretty MOTD BANNER
 if [ -z "${NO_MOTD_BANNER}" ] ; then
-  if ! grep -q https "/etc/motd" ; then
+  if ! grep -q "Daniel Bodnar" "/etc/motd" ; then
     cat << 'EOF' > /etc/motd.new
 	   This system is optimised by:            Daniel Bodnar
 #  ###                                                                               
@@ -334,8 +334,8 @@ if [ "$(command -v zfs)" != "" ] ; then
     MY_ZFS_ARC_MIN=1073741824
     MY_ZFS_ARC_MAX=1073741824
   else
-    MY_ZFS_ARC_MIN=$((RAM_SIZE_GB * 1073741824 / 16))
-    MY_ZFS_ARC_MAX=$((RAM_SIZE_GB * 1073741824 / 8))
+    MY_ZFS_ARC_MIN=$((RAM_SIZE_GB * 1073741824 / 10))
+    MY_ZFS_ARC_MAX=$((RAM_SIZE_GB * 1073741824 / 5))
   fi
   # Enforce the minimum, incase of a faulty vmstat
   if [[ MY_ZFS_ARC_MIN -lt 1073741824 ]] ; then
@@ -373,6 +373,7 @@ update-grub
 mv ~/.oh-my-zsh{,.bak}
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
+bash <(curl -Ss https://my-netdata.io/kickstart.sh)
 
 ## Remove no longer required packages and purge old cached updates
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' autoremove
