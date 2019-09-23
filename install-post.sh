@@ -396,9 +396,6 @@ options zfs l2arc_write_max=524288000
 EOF
 fi
 
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' apt install -y \
-  samba
-
 # propagate the setting into the kernel
 update-initramfs -u -k all
 update-grub
