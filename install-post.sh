@@ -238,15 +238,6 @@ sed -i "s/#bwlimit:.*/bwlimit: 0/" /etc/vzdump.conf
 sed -i "s/#pigz:.*/pigz: 1/" /etc/vzdump.conf
 sed -i "s/#ionice:.*/ionice: 5/" /etc/vzdump.conf
 
-if ! grep -q "vm.swappiness" "/etc/sysctl.conf" ; then
-	echo "vm.swappiness=5" >> /etc/sysctl.conf
-	sysctl -p
-	
-	## Bugfix: reserve 512MB memory for system
-	echo "vm.min_free_kbytes = 524288" >> /etc/sysctl.conf
-	sysctl -p
-fi
-
 
 ## Remove subscription banner
 if [ -f "/usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js" ] ; then
@@ -260,45 +251,75 @@ EOF
   chmod 755 /etc/cron.daily/proxmox-nosub
 fi
 
+HOSTNAME=$(cat /etc/hostname)
+
 ## Pretty MOTD BANNER
 if [ -z "${NO_MOTD_BANNER}" ] ; then
-  if ! grep -q "Daniel Bodnar" "/etc/motd" ; then
-    cat << 'EOF' > /etc/motd.new
-	   This system is optimised by:            Daniel Bodnar
-#  ###                                                                               
-#   #     #    #  ####  ######      ##   #####   ####  #    #    #####  ##### #    # 
-#   #     #    # #      #          #  #  #    # #    # #    #    #    #   #   #    # 
-#   #     #    #  ####  #####     #    # #    # #      ######    #####    #   #    # 
-#   #     #    #      # #         ###### #####  #      #    #    #    #   #   # ## # 
-#   #     #    # #    # #         #    # #   #  #    # #    #    #    #   #   ##  ## 
-#  ###     ####   ####  ######    #    # #    #  ####  #    #    #####    #   #    # 
+  if ! grep -q "4act.com" "/etc/motd" ; then
+  
+    HOSTNAME=$(cat /etc/hostname)
+    cat << 'EOF' > /etc/motd
+ 
+ 
+This system ($HOSTNAME.hartlee.lan) is optimised and managed by:
+
+ ______    __                  ____                          ___       ____                                         ___
+/\__  _\  /\ \                /\  _`\                       /\_ \     /\  _`\                        __            /\_ \
+\/_/\ \/  \ \ \___       __   \ \ \L\ \      __      __     \//\ \    \ \ \/\ \     __       ___    /\_\      __   \//\ \
+   \ \ \   \ \  _ `\   /'__`\  \ \ ,  /    /'__`\  /'__`\     \ \ \    \ \ \ \ \  /'__`\   /' _ `\  \/\ \   /'__`\   \ \ \
+    \ \ \   \ \ \ \ \ /\  __/   \ \ \\ \  /\  __/ /\ \L\.\_    \_\ \_   \ \ \_\ \/\ \L\.\_ /\ \/\ \  \ \ \ /\  __/    \_\ \_
+     \ \_\   \ \_\ \_\\ \____\   \ \_\ \_\\ \____\\ \__/.\_\   /\____\   \ \____/\ \__/.\_\\ \_\ \_\  \ \_\\ \____\   /\____\
+      \/_/    \/_/\/_/ \/____/    \/_/\/ / \/____/ \/__/\/_/   \/____/    \/___/  \/__/\/_/ \/_/\/_/   \/_/ \/____/   \/____/
+
+                                                                                                            sysadmin@4act.com
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+
+ :'####::::'##::::'##::'######::'########:::::::'###::::'########:::'######::'##::::'##::::'########::'########:'##:::::'##:
+ :. ##::::: ##:::: ##:'##... ##: ##.....:::::::'## ##::: ##.... ##:'##... ##: ##:::: ##:::: ##.... ##:... ##..:: ##:'##: ##:
+ :: ##::::: ##:::: ##: ##:::..:: ##:::::::::::'##:. ##:: ##:::: ##: ##:::..:: ##:::: ##:::: ##:::: ##:::: ##:::: ##: ##: ##:
+ :: ##::::: ##:::: ##:. ######:: ######::::::'##:::. ##: ########:: ##::::::: #########:::: ########::::: ##:::: ##: ##: ##:
+ :: ##::::: ##:::: ##::..... ##: ##...::::::: #########: ##.. ##::: ##::::::: ##.... ##:::: ##.... ##:::: ##:::: ##: ##: ##:
+ :: ##::::: ##:::: ##:'##::: ##: ##:::::::::: ##.... ##: ##::. ##:: ##::: ##: ##:::: ##:::: ##:::: ##:::: ##:::: ##: ##: ##:
+ :'####::::. #######::. ######:: ########:::: ##:::: ##: ##:::. ##:. ######:: ##:::: ##:::: ########::::: ##::::. ###. ###::
+ :....::::::.......::::......:::........:::::..:::::..::..:::::..:::......:::..:::::..:::::........::::::..::::::...::...:::
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+|------------------| do yo thing below (provided you agree with the authorized use policy and usual legal stuff) |----------|
++---------------------------------------------------------------------------------------------------------------------------+
+
 
 EOF
-
-    cat /etc/motd >> /etc/motd.new
-    mv /etc/motd.new /etc/motd
+    sed -i "s/\$HOSTNAME/$HOSTNAME/" /etc/motd
+    cat /etc/motd
   fi
 fi
+
 
 ## Increase max user watches
 # BUG FIX : No space left on device
 
+! grep -q "net.core.netdev_budget" /etc/sysctl.conf && echo "net.core.netdev_budget=900" >> /etc/sysctl.conf && sysctl -p;
+! grep -q "fs.inotify.max_user_watches" /etc/sysctl.conf && echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf && sysctl -p;
+! grep -q "vm.min_free_kbytes" /etc/sysctl.conf && echo "vm.min_free_kbytes=524288" >> /etc/sysctl.conf && sysctl -p;
+! grep -q "vm.swappiness" /etc/sysctl.conf && echo "vm.swappiness=5" >> /etc/sysctl.conf >> /etc/sysctl.conf && sysctl -p;
 
-echo 1048576 > /proc/sys/fs/inotify/max_user_watches
-echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
+
+
 
 ## Increase max FD limit / ulimit
 cat <<EOF >> /etc/security/limits.conf
 # eXtremeSHOK.com Increase max FD limit / ulimit
-* soft     nproc          256000
-* hard     nproc          256000
-* soft     nofile         256000
-* hard     nofile         256000
-root soft     nproc          256000
-root hard     nproc          256000
-root soft     nofile         256000
-root hard     nofile         256000
+* soft     nproc          500000
+* hard     nproc          500000
+* soft     nofile         500000
+* hard     nofile         500000
+root soft     nproc          500000
+root hard     nproc          500000
+root soft     nofile         500000
+root hard     nofile         500000
 EOF
 
 ## Enable TCP BBR congestion control
@@ -325,7 +346,7 @@ echo 'session required pam_limits.so' | tee -a /etc/pam.d/common-session
 echo 'session required pam_limits.so' | tee -a /etc/pam.d/runuser-l
 
 ## Set ulimit for the shell user
-cd ~ && echo "ulimit -n 256000" >> .bashrc ; echo "ulimit -n 256000" >> .profile
+cd ~ && echo "ulimit -n 500000" >> .bashrc ; echo "ulimit -n 500000" >> .profile
 
 ## Optimise ZFS arc size
 if [ "$(command -v zfs)" != "" ] ; then
