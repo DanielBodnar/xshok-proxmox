@@ -135,6 +135,10 @@ apt update > /dev/null
 
 #snmpd snmp-mibs-downloader
 
+
+echo "Installing kernel pve-kernel-5.0.21-1-pve"
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install pve-kernel-5.0.21-1-pve
+
 ## Detect AMD EPYC CPU and install kernel 5.0
 if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ]; then
   echo "AMD EPYC detected"
@@ -144,8 +148,6 @@ if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ]; then
     sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="idle=nomwait /g' /etc/default/grub
     update-grub
   fi
-  echo "Installing kernel pve-kernel-5.0.21-1-pve"
-  /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install pve-kernel-5.0.21-1-pve
 fi
 
 if [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "EPYC")" != "" ] || [ "$(grep -i -m 1 "model name" /proc/cpuinfo | grep -i "Ryzen")" != "" ]; then
@@ -177,6 +179,16 @@ EOF
 systemctl enable kexec-pve.service
 echo "alias reboot-quick='systemctl kexec'" >> /root/.bash_profile
 fi 
+
+if [ ! -f "/usr/sbin/reboot-full" ]; 
+then
+  mv /usr/sbin/reboot{,-full}
+  cat <<'EOF' > /etc/sbin/reboot
+  #!/usr/bin/sh
+  /sbin/kexec -l /boot/pve/vmlinuz --initrd=/boot/pve/initrd.img --reuse-cmdline && /sbin/kexec -e
+EOF
+chmod +x /usr/sbin/reboot
+fi
 
 ## Disable portmapper / rpcbind (security)
 #systemctl disable rpcbind
