@@ -313,7 +313,8 @@ fi
 ## Increase max user watches
 # BUG FIX : No space left on device
 
-! grep -q "net.core.netdev_budget" /etc/sysctl.conf && echo "net.core.netdev_budget=900" >> /etc/sysctl.conf && sysctl -p;
+! grep -q "net.core.netdev_budget" /etc/sysctl.conf && echo "net.core.netdev_budget=600" >> /etc/sysctl.conf && sysctl -p;
+! grep -q "net.core.netdev_max_backlog" /etc/sysctl.conf && echo "net.core.netdev_max_backlog=5000" >> /etc/sysctl.conf && sysctl -p;
 ! grep -q "fs.inotify.max_user_watches" /etc/sysctl.conf && echo "fs.inotify.max_user_watches=1048576" >> /etc/sysctl.conf && sysctl -p;
 ! grep -q "vm.min_free_kbytes" /etc/sysctl.conf && echo "vm.min_free_kbytes=524288" >> /etc/sysctl.conf && sysctl -p;
 ! grep -q "vm.swappiness" /etc/sysctl.conf && echo "vm.swappiness=5" >> /etc/sysctl.conf >> /etc/sysctl.conf && sysctl -p;
