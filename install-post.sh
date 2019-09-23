@@ -183,7 +183,7 @@ fi
 if [ ! -f "/usr/sbin/reboot-full" ]; 
 then
   mv /usr/sbin/reboot{,-full}
-  cat <<'EOF' > /etc/sbin/reboot
+  cat <<'EOF' > /usr/sbin/reboot
   #!/usr/bin/sh
   /sbin/kexec -l /boot/pve/vmlinuz --initrd=/boot/pve/initrd.img --reuse-cmdline && /sbin/kexec -e
 EOF
