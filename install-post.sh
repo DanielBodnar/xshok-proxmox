@@ -369,8 +369,8 @@ if [ "$(command -v zfs)" != "" ] ; then
     MY_ZFS_ARC_MIN=1073741824
     MY_ZFS_ARC_MAX=1073741824
   else
-    MY_ZFS_ARC_MIN=$((RAM_SIZE_GB * 1073741824 / 10))
-    MY_ZFS_ARC_MAX=$((RAM_SIZE_GB * 1073741824 / 5))
+    MY_ZFS_ARC_MIN=$((RAM_SIZE_GB * 1073741824 / 5))
+    MY_ZFS_ARC_MAX=$((RAM_SIZE_GB * 1073741824 / 2))
   fi
   # Enforce the minimum, incase of a faulty vmstat
   if [[ MY_ZFS_ARC_MIN -lt 1073741824 ]] ; then
