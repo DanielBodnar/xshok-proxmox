@@ -408,11 +408,11 @@ bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
 
 systemctl enable --now netdata
 
-
 ## Remove no longer required packages and purge old cached updates
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoremove
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoclean
 
+wget https://download2.veeam.com/veeam-release-deb_1.0.7_amd64.deb && dpkg -i ./veeam-release* && apt-get update && apt-get install veeam -y
 
 ## Script Finish
 echo -e '\033[1;33m Finished....please restart the system \033[0m'
