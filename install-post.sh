@@ -412,7 +412,18 @@ systemctl enable --now netdata
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoremove
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoclean
 
+# Install Veeam Linux Agent
 wget https://download2.veeam.com/veeam-release-deb_1.0.7_amd64.deb && dpkg -i ./veeam-release* && apt-get update && apt-get install veeam -y
+
+# Install wireguard
+echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable.list
+printf 'Package: *\nPin: release a=unstable\nPin-Priority: 90\n' > /etc/apt/preferences.d/limit-unstable
+apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 648ACFD622F3D138 04EE7237B7D453EC
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' update
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install wireguard
+
+
+
 
 ## Script Finish
 echo -e '\033[1;33m Finished....please restart the system \033[0m'
