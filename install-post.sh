@@ -422,6 +422,9 @@ apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 648ACFD622F3D138 04EE72
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' update
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install wireguard
 
+curl -L https://github.com/docker/machine/releases/latest/download/docker-machine-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-machine && chmod +x /usr/local/bin/docker-machine
+sudo curl -L https://github.com/janeczku/docker-machine-vultr/releases/latest/download/docker-machine-driver-vultr-Linux-x86_64 -o /usr/local/bin/docker-machine-driver-vultr && sudo chmod +x /usr/local/bin/docker-machine-driver-vultr
+sudo curl -L https://github.com/kubernetes/minikube/releases/latest/download/docker-machine-driver-kvm2 -o /usr/local/bin/docker-machine-driver-kvm2 && sudo chmod +x /usr/local/bin/docker-machine-driver-*
 
 
 
