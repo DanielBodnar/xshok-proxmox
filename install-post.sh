@@ -413,7 +413,7 @@ systemctl enable --now netdata
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoclean
 
 # Install Veeam Linux Agent
-wget https://download2.veeam.com/veeam-release-deb_1.0.7_amd64.deb && dpkg -i ./veeam-release* && apt-get update && apt-get install veeam -y
+# wget https://download2.veeam.com/veeam-release-deb_1.0.7_amd64.deb && dpkg -i ./veeam-release* && apt-get update && apt-get install veeam -y
 
 # Install wireguard
 echo "deb http://deb.debian.org/debian/ unstable main" > /etc/apt/sources.list.d/unstable.list
