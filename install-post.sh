@@ -404,9 +404,9 @@ update-grub
 mv ~/.oh-my-zsh{,.bak}
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
-bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
+#bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait
 
-systemctl enable --now netdata
+#systemctl enable --now netdata
 
 ## Remove no longer required packages and purge old cached updates
 /usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' autoremove
