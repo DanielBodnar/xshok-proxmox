@@ -129,7 +129,7 @@ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 apt update > /dev/null
 
 ## Install common system utilities
-/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
+/usr/bin/env DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::='--force-confdef' install -y whois omping tmux zsh sshpass wget axel nano pigz net-tools htop iptraf iotop iftop iperf vim vim-nox unzip zip curl dos2unix dialog mlocate build-essential git ipset docker-ce samba
 
 
 
